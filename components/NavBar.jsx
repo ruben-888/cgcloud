@@ -15,6 +15,8 @@ import {
 import { useUser } from '@auth0/nextjs-auth0';
 
 import RouterLink from './RouterLink';
+import Image from 'next/image'
+import nav_logo from '../public/img/cl_cloud_logo_nav.png';
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +27,8 @@ const NavBar = () => {
     <div className="nav-container" data-testid="navbar">
       <Navbar color="light" light expand="md">
         <Container>
-          <NavbarBrand className="logo" />
+        
+          <Image className="logo" id="nav_la_logo" src={nav_logo} />
           <NavbarToggler onClick={toggle} data-testid="navbar-toggle" />
           <Collapse isOpen={isOpen} navbar>
             <Nav className="mr-auto" navbar data-testid="navbar-items">

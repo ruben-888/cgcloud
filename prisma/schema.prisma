@@ -2,19 +2,20 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider          = "mysql"
+  //url = "mysql://z42auawygao5:pscale_pw_gH2ev_R949wnLd5HPvEcAN5QBsNywEcIvJrXzZ6pjAc@o86u0p5tccy7.us-west-2.psdb.cloud/cg-cloud-db?sslmode=require&sslaccept=strict&sslcert=/etc/ssl/cert.pem"
+  url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
-  planetScaleMode = true
+  planetScaleMode   = true
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["planetScaleMode"]
 }
 
 model Post {
-  id        Int      @default(autoincrement()) @id
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   title     String   @db.VarChar(255)
@@ -22,9 +23,44 @@ model Post {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  email     String   @unique
+  id        Int            @id @default(autoincrement())
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  email     String         @unique
   firstName String?
   lastName  String?
+  auth0Id   String?        @unique
+  role      Role
+  teams     UsersOnTeams[]
+}
+
+model Team {
+  id      Int            @id @default(autoincrement())
+  name    String         @db.VarChar(255)
+  users   UsersOnTeams[]
+  streams Stream[]
+}
+
+model UsersOnTeams {
+  userId     Int
+  teamId     Int
+  roleId     Int
+  assignedAt DateTime @default(now())
+
+  User User @relation(fields: [userId], references: [id])
+  Team Team @relation(fields: [teamId], references: [id])
+  @@id([userId, teamId])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Stream {
+  id          String @id @default(cuid())
+  name        String
+  description String @db.VarChar(1000)
+  Team        Team?  @relation(fields: [teamId], references: [id])
+  teamId      Int?
 }
